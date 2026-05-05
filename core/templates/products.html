@@ -1,0 +1,9 @@
+<h1>Товари</h1>
+
+{% for p in products %}
+    <div>
+        <h3>{{ p.name }}</h3>
+        <p>{{ p.price }} грн</p>
+        <button disabled>Купити</button>
+    </div>
+{% endfor %}
