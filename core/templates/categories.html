@@ -1,9 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
 <h1>Категорії</h1>
 
-{% for c in categories %}
-    <p>
-        <a href="/category/{{ c.id }}/">
-            {{ c.name }}
+{% for category in categories %}
+    <div>
+        <a href="/category/{{ category.id }}/">
+            {{ category.name }}
         </a>
-    </p>
+    </div>
 {% endfor %}
+
+{% endblock %}

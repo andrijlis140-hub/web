@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ product.name }}</h1>
+<p>Ціна: {{ product.price }} грн</p>
+
+<h2>Відгуки</h2>
+
+{% for review in reviews %}
+    <p>⭐ {{ review.rating }} / 5</p>
+    <p>{{ review.text }}</p>
+    <hr>
+{% empty %}
+    <p>Ще немає відгуків</p>
+{% endfor %}
+
+<h3>Додати відгук</h3>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Відправити</button>
+</form>
+
+{% endblock %}

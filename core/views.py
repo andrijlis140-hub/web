@@ -51,3 +51,27 @@ def product_detail(request, pk):
         'avg_rating': avg_rating,
         'form': form
     })
+    
+from django.shortcuts import get_object_or_404, redirect
+from .models import Product, Review
+from .forms import ReviewForm
+
+def product_detail(request, pk):
+    product = get_object_or_404(Product, id=pk)
+    reviews = Review.objects.filter(product=product)
+
+    if request.method == "POST":
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.product = product
+            review.save()
+            return redirect('product_detail', pk=pk)
+    else:
+        form = ReviewForm()
+
+    return render(request, 'product_detail.html', {
+        'product': product,
+        'reviews': reviews,
+        'form': form
+    })
