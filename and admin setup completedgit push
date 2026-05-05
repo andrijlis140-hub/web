@@ -1,0 +1,23 @@
+[33mcommit 4b66c6ad3a69c191d7b1cfa54191d0247cf12fad[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: andrijlis15-source <andrijlis15@gmail.com>
+Date:   Tue May 5 19:26:05 2026 +0200
+
+    remove cached files and apply gitignore properly
+
+[33mcommit 2a4fbae29cfe286bb40c7bd871c7cf8ea96b4ffb[m
+Author: andrijlis15-source <andrijlis15@gmail.com>
+Date:   Tue May 5 19:25:35 2026 +0200
+
+    add gitignore to exclude cache and db
+
+[33mcommit 047f33147b03ddc2b910e9b573f1ba2a4c41aadf[m
+Author: andrijlis15-source <andrijlis15@gmail.com>
+Date:   Tue May 5 18:49:30 2026 +0200
+
+    lab3 basic pages working
+
+[33mcommit 937c27a696d2804215c5e93a67ab779b82566735[m
+Author: andrijlis15-source <andrijlis15@gmail.com>
+Date:   Tue May 5 18:21:34 2026 +0200
+
+    lab2 django project created
