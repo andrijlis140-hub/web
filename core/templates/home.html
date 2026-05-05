@@ -1,2 +1,11 @@
-<h1>Мій перший сайт 🚀</h1>
-<p>Все працює!</p>
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Товари</h1>
+
+{% for p in products %}
+    <p>{{ p.name }} - {{ p.price }} грн</p>
+{% endfor %}
+
+{% endblock %}
