@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #000;
+        margin: 0;
+        padding: 0;
+        color: #fff;
+        overflow-x: hidden;
+    }
+
+    /* Основний контейнер */
+    .product-hero-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        min-height: 90vh;
+        margin: 20px;
+        background: #0a0a0a;
+        border: 2px solid #d4af37;
+        box-shadow: 0 0 40px rgba(212, 175, 55, 0.15);
+        overflow: hidden;
+    }
+
+    .product-visual-box {
+        background-color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        border-right: 2px solid #d4af37;
+        overflow: hidden;
+    }
+
+    .product-visual-box img {
+        height: 85vh; 
+        width: auto;
+        max-width: 95%;
+        object-fit: contain;
+        transition: transform 0.4s ease;
+    }
+
+    .product-visual-box:hover img {
+        transform: scale(1.05);
+    }
+
+    .product-content-box {
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        box-sizing: border-box;
+    }
+
+    .product-content-box h1 {
+        font-family: 'Georgia', serif;
+        font-size: clamp(1.4rem, 3vw, 2.5rem);
+        color: #f1c40f;
+        margin: 0 0 15px 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        line-height: 1.2;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+        padding-bottom: 15px;
+    }
+
+    .price-large {
+        font-size: 2.5rem;
+        color: #d4af37;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .stock-info {
+        color: #888;
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+    }
+
+    .product-description-text {
+        font-size: 1.05rem;
+        line-height: 1.6;
+        color: #bdc3c7;
+        text-align: justify;
+        max-height: 400px;
+        overflow-y: auto;
+        padding-right: 15px;
+        margin-bottom: 25px;
+    }
+
+    .product-description-text::-webkit-scrollbar { width: 4px; }
+    .product-description-text::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 10px; }
+
+    .gold-action-btn {
+        width: 100%;
+        background: transparent;
+        border: 2px solid #d4af37;
+        color: #d4af37;
+        padding: 20px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: auto;
+    }
+
+    .gold-action-btn:hover {
+        background: #d4af37;
+        color: #000;
+        box-shadow: 0 0 20px #f1c40f;
+    }
+
+    /* --- СТИЛІ ДЛЯ ВІДГУКІВ --- */
+    .review-form-container {
+        background: #0a0a0a;
+        padding: 30px;
+        border: 1px solid #222;
+        margin-top: 30px;
+    }
+
+    .review-input, .review-select {
+        width: 100%;
+        background: #111;
+        border: 1px solid #333;
+        color: #fff;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 4px;
+        font-family: inherit;
+    }
+
+    .review-input:focus {
+        border-color: #f1c40f;
+        outline: none;
+    }
+
+    @media (max-width: 1024px) {
+        .product-hero-container { grid-template-columns: 1fr; }
+        .product-visual-box { border-right: none; border-bottom: 2px solid #d4af37; }
+        .product-visual-box img { height: 60vh; }
+    }
+</style>
+
+<div class="product-hero-container">
+    <div class="product-visual-box">
+        {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+        {% else %}
+            <div style="color: #000; font-size: 5rem;">🗡️</div>
+        {% endif %}
+    </div>
+
+    <div class="product-content-box">
+        <h1>{{ product.name }}</h1>
+        <div class="price-large">{{ product.price }} грн</div>
+        <div class="stock-info">🛡️ В наявності: <span style="color: #f1c40f;">{{ product.stock|default:"10" }} шт.</span></div>
+
+        <div class="product-description-text">
+            {{ product.description|linebreaks }}
+        </div>
+
+        <form action="{% url 'add_to_cart' product.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="gold-action-btn">Додати до скарбниці 🧺</button>
+        </form>
+    </div>
+</div>
+
+<div class="container" style="max-width: 1200px; margin: 40px auto; padding: 0 20px;">
+    <h2 style="color: #f1c40f; font-family: 'Georgia', serif; border-bottom: 1px solid #333; padding-bottom: 10px;">Відгуки мандрівників</h2>
+    
+    {% if reviews %}
+        {% for review in reviews %}
+            <div style="background: #0a0a0a; border-left: 3px solid #d4af37; padding: 15px; margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between;">
+                    <strong style="color: #f1c40f;">👤 {{ review.user.username }}</strong>
+                    <span style="color: #d4af37;">⭐ {{ review.rating|default:"5" }}/5</span>
+                </div>
+                <p style="color: #bdc3c7; margin: 10px 0; font-style: italic;">"{{ review.text }}"</p>
+                <small style="color: #555;">{{ review.created_at|date:"d.m.Y" }}</small>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p style="color: #555; font-style: italic;">Будьте першим, хто залишить відгук про цей артефакт!</p>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+        <div class="review-form-container">
+            <h3 style="color: #f1c40f; margin-top: 0;">Залишити свій відбиток в історії</h3>
+            <form method="post">
+                {% csrf_token %}
+                <div style="margin-bottom: 10px;">
+                    <label style="display: block; margin-bottom: 5px;">Ваша оцінка:</label>
+                    <select name="rating" class="review-select" style="width: auto;">
+                        <option value="5">⭐⭐⭐⭐⭐ (Неймовірно)</option>
+                        <option value="4">⭐⭐⭐⭐ (Добре)</option>
+                        <option value="3">⭐⭐⭐ (Посередньо)</option>
+                        <option value="2">⭐⭐ (Погано)</option>
+                        <option value="1">⭐ (Жахливо)</option>
+                    </select>
+                </div>
+                <textarea name="text" class="review-input" rows="4" placeholder="Напишіть ваші враження від артефакту..." required></textarea>
+                <button type="submit" class="gold-action-btn" style="padding: 12px; font-size: 0.9rem;">💎 Відправити відгук</button>
+            </form>
+        </div>
+    {% else %}
+        <div style="margin-top: 30px; text-align: center; color: #888; border: 1px dashed #333; padding: 20px;">
+            Щоб залишити відгук, вам потрібно <a href="{% url 'login' %}" style="color: #f1c40f;">увійти в систему</a>.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

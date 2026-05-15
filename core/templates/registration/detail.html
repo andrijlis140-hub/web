@@ -1,0 +1,35 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ item.name }}{% endblock %}
+
+{% block content %}
+<div style="display: flex; gap: 40px; margin-top: 20px; align-items: start;">
+    <!-- Зображення товару -->
+    <div style="flex: 1;">
+        {% if item.image %}
+            <img src="{{ item.image.url }}" alt="{{ item.name }}" style="width: 100%; border-radius: 15px; border: 2px solid #555;">
+        {% endif %}
+    </div>
+
+    <!-- Інформація про товар -->
+    <div style="flex: 1;">
+        <h1 style="color: #FFD700;">{{ item.name }}</h1>
+        <p style="font-size: 1.2em; line-height: 1.6;">{{ item.description }}</p>
+        
+        <h3 style="color: #4CAF50;">Ціна: {{ item.price }} грн</h3>
+
+        <div style="margin-top: 30px;">
+            <form action="#" method="post">
+                {% csrf_token %}
+                <button type="submit" style="background: #e67e22; color: white; padding: 15px 30px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                    Додати до кошика
+                </button>
+            </form>
+            
+            <a href="{% url 'index' %}" style="display: inline-block; margin-top: 20px; color: #aaa; text-decoration: none;">
+                ← Назад до каталогу
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

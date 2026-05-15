@@ -1,0 +1,268 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}The One Shop{% endblock %}</title>
+    <style>
+        /* Базові налаштування */
+        body {
+            font-family: 'Georgia', serif;
+            margin: 0;
+            background-color: #fdfaf3;
+            color: #2c3e50;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Хедер */
+        header {
+            background: #1a1a1a;
+            color: #f1c40f;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #d4af37;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo-link {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-link h2 {
+            margin: 0;
+            font-variant: small-caps;
+            letter-spacing: 2px;
+            transition: 0.3s;
+        }
+
+        .logo-link:hover h2 {
+            color: #d4af37;
+            text-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+        }
+
+        /* Навігація */
+        nav {
+            display: flex;
+            align-items: center;
+        }
+
+        nav a, nav button {
+            color: #ecf0f1;
+            margin-left: 15px;
+            text-decoration: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        nav a:hover, nav button:hover {
+            color: #d4af37;
+        }
+
+        .category-nav {
+            display: flex;
+            border-right: 1px solid #444;
+            padding-right: 10px;
+            margin-right: 10px;
+        }
+
+        .category-nav a {
+            color: #f1c40f;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 13px;
+            margin-left: 12px;
+        }
+
+        /* Стиль для значка кількості в кошику */
+        .cart-badge {
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 7px;
+            font-size: 10px;
+            position: absolute;
+            top: -12px;
+            right: -15px;
+            font-weight: bold;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            border: 1px solid #fff;
+        }
+
+        /* Повідомлення (Django Messages) */
+        .messages-container {
+            position: fixed;
+            top: 85px;
+            right: 20px;
+            z-index: 2000;
+            max-width: 350px;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 5px solid #d4af37;
+            background: #1a1a1a;
+            color: #f1c40f;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Контейнер контенту */
+        .container {
+            padding: 40px;
+            flex: 1;
+        }
+
+        /* Підвал (Footer) */
+        .main-footer {
+            background: #1a1a1a;
+            color: #95a5a6;
+            padding: 50px 40px 20px;
+            margin-top: 60px;
+            border-top: 3px solid #d4af37;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-section h4 { 
+            color: #f1c40f; 
+            text-transform: uppercase; 
+            margin-bottom: 15px; 
+            letter-spacing: 1px; 
+        }
+
+        .footer-section p, .footer-section a { 
+            color: #bdc3c7; 
+            text-decoration: none; 
+            font-size: 14px; 
+            line-height: 1.8; 
+        }
+
+        .footer-section a:hover { color: #d4af37; }
+
+        .footer-bottom {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+            text-align: center;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="{% url 'home' %}" class="logo-link">
+        <h2>💍 The One Shop</h2>
+    </a>
+    <nav>
+        <a href="{% url 'home' %}">Головна</a>
+        <div class="category-nav">
+            <a href="{% url 'category_detail' 'swords' %}">Мечі</a>
+            <a href="{% url 'category_detail' 'apparel' %}">Одяг</a>
+            <a href="{% url 'category_detail' 'lego' %}">LEGO</a>
+            <a href="{% url 'category_detail' 'accessories' %}">Аксесуари</a>
+            <a href="{% url 'category_detail' 'figures' %}">Фігурки</a>
+        </div>
+        
+        <a href="{% url 'cart_detail' %}" style="display: flex; align-items: center; position: relative; margin-right: 25px;">
+            🧺 Кошик
+            {% if cart_count > 0 %}
+                <span class="cart-badge">{{ cart_count }}</span>
+            {% endif %}
+        </a>
+
+        {% if user.is_authenticated %}
+            <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit">Вийти ({{ user.username }})</button>
+            </form>
+        {% else %}
+            <a href="{% url 'login' %}">Увійти</a>
+            <a href="{% url 'signup' %}" style="color: #d4af37;">Реєстрація</a>
+        {% endif %}
+    </nav>
+</header>
+
+<!-- Спливаючі сповіщення (Messages) -->
+{% if messages %}
+<div class="messages-container">
+    {% for message in messages %}
+        <div class="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="container">
+    {% block content %}
+    <!-- Тут буде вміст сторінок -->
+    {% endblock %}
+</div>
+
+<footer class="main-footer">
+    <div class="footer-grid">
+        <div class="footer-section">
+            <h4>Про Крамницю</h4>
+            <p>Найкращі артефакти Середзем'я: від мечів викуваних у Гондоліні до затишного одягу з Ширу. Ми знаємо ціну справжнім скарбам.</p>
+        </div>
+        <div class="footer-section">
+            <h4>Швидкі посилання</h4>
+            <a href="{% url 'home' %}">Головна</a><br>
+            <a href="#">Мапа скарбів</a><br>
+            <a href="#">Умови доставки орлами</a>
+        </div>
+        <div class="footer-section">
+            <h4>Контакти</h4>
+            <p>📍 Розділ, Торба-на-Кручі<br>
+            ✉️ mail@theoneshop.me<br>
+            📞 +380 (44) 777-11-11</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>2026 © Крамниця Середзем'я. Усі права захищені Сауроном (майже).</p>
+        <p style="color: #555; margin-top: 5px;">Створено для справжніх фанатів професора Толкіна.</p>
+    </div>
+</footer>
+
+<script>
+    // Скрипт для автоматичного зникнення сповіщень через 4 секунди
+    setTimeout(function() {
+        let messages = document.querySelector('.messages-container');
+        if (messages) {
+            messages.style.transition = "opacity 0.5s ease";
+            messages.style.opacity = "0";
+            setTimeout(() => messages.remove(), 500);
+        }
+    }, 4000);
+</script>
+
+</body>
+</html>

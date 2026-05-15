@@ -1,0 +1,83 @@
+{% extends 'registration/base.html' %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 50px auto; font-family: 'Georgia', serif;">
+    <h1 style="text-align: center; color: #d4af37; margin-bottom: 30px;">🧺 Твій кошик</h1>
+
+    {% if products %}
+        <div style="background: white; border: 2px solid #d4af37; border-radius: 12px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #f1f1f1; color: #7f8c8d; text-transform: uppercase; font-size: 0.85em; letter-spacing: 1px;">
+                        <th style="padding: 15px;">Товар</th>
+                        <th style="padding: 15px;">Ціна</th>
+                        <th style="padding: 15px; text-align: center;">Кількість</th>
+                        <th style="padding: 15px;">Сума</th>
+                        <th style="padding: 15px; text-align: center;">Дія</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr style="border-bottom: 1px solid #eee; transition: 0.2s;" onmouseover="this.style.backgroundColor='#fafafa'" onmouseout="this.style.backgroundColor='transparent'">
+                        <td style="padding: 20px 15px;">
+                            <a href="{% url 'product_detail' product.id %}" style="text-decoration: none; color: #1a1a1a; font-weight: bold; font-size: 1.1em;">
+                                {{ product.name }}
+                            </a>
+                        </td>
+                        <td style="padding: 20px 15px; color: #555;">{{ product.price }} грн</td>
+                        
+                        <td style="padding: 20px 15px; text-align: center;">
+                            <span style="background: #eee; padding: 5px 15px; border-radius: 20px; font-weight: bold; color: #333;">
+                                {{ product.quantity }} шт.
+                            </span>
+                        </td>
+
+                        <td style="padding: 20px 15px; font-weight: bold; color: #1a1a1a;">
+                            {{ product.total_price }} грн
+                        </td>
+
+                        <td style="padding: 20px 15px; text-align: center;">
+                            <a href="{% url 'remove_from_cart' product.id %}" 
+                               title="Викинути в Мордор"
+                               style="text-decoration: none; color: #e74c3c; font-size: 1.1em; padding: 8px; border-radius: 50%; transition: 0.3s; display: inline-block;"
+                               onmouseover="this.style.background='#fff0f0';"
+                               onmouseout="this.style.background='transparent';">
+                                🗑️
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #f1f1f1; display: flex; justify-content: space-between; align-items: center;">
+                <a href="{% url 'home' %}" style="text-decoration: none; color: #7f8c8d; font-weight: bold; transition: 0.3s;"
+                   onmouseover="this.style.color='#d4af37';"
+                   onmouseout="this.style.color='#7f8c8d';">
+                    ← Продовжити покупки
+                </a>
+                
+                <div style="text-align: right;">
+                    <p style="margin: 0; color: #7f8c8d; font-size: 0.9em;">Загальна сума до сплати:</p>
+                    <p style="margin: 5px 0 20px 0; font-size: 1.8em; font-weight: bold; color: #d4af37;">
+                        {{ total_cart_price }} грн
+                    </p>
+                    <a href="{% url 'checkout' %}" style="text-decoration: none; background: #1a1a1a; color: #d4af37; border: 2px solid #d4af37; padding: 15px 40px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1em; transition: 0.3s; display: inline-block;"
+                            onmouseover="this.style.background='#d4af37'; this.style.color='#1a1a1a';"
+                            onmouseout="this.style.background='#1a1a1a'; this.style.color='#d4af37';">
+                        Оформити замовлення
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div style="padding: 60px; border: 2px dashed #d4af37; border-radius: 12px; background: #fffdf5; text-align: center;">
+            <div style="font-size: 4em; margin-bottom: 20px;">🎒</div>
+            <p style="font-size: 1.5em; color: #7f8c8d; margin-bottom: 30px;">Наразі твоя сумка порожня, мандрівнику.</p>
+            <a href="{% url 'home' %}" style="text-decoration: none; color: white; background: #d4af37; padding: 15px 35px; border-radius: 8px; font-weight: bold; display: inline-block;">
+                Повернутися до крамниці
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

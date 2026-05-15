@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    body { background-color: #000; color: #fff; }
+    .checkout-container { padding: 60px 5%; max-width: 1200px; margin: 0 auto; }
+    .checkout-title { font-family: 'Cinzel', serif; color: #f1c40f; font-size: 2.5rem; text-align: center; margin-bottom: 50px; text-transform: uppercase; letter-spacing: 3px; }
+    
+    .checkout-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px; }
+    .checkout-step { background: #0a0a0a; border: 1px solid #222; padding: 30px; margin-bottom: 25px; border-radius: 4px; }
+    .step-header { display: flex; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #222; padding-bottom: 15px; }
+    .step-number { background: #d4af37; color: #000; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 15px; }
+    .step-header h3 { margin: 0; color: #f1c40f; font-size: 1.4rem; text-transform: uppercase; }
+
+    /* Стилізація полів */
+    .form-field-wrapper { margin-bottom: 20px; }
+    .form-field-wrapper label { display: block; color: #f1c40f; margin-bottom: 8px; font-size: 0.9rem; text-transform: uppercase; }
+    .form-field-wrapper input, .form-field-wrapper select, .form-field-wrapper textarea {
+        width: 100%; background: #111; border: 1px solid #333; padding: 14px; color: #fff; border-radius: 2px; box-sizing: border-box;
+    }
+    .form-field-wrapper input:focus { border-color: #f1c40f; outline: none; box-shadow: 0 0 10px rgba(241, 196, 15, 0.2); }
+
+    /* Помилки */
+    .error-banner { background: rgba(231, 76, 60, 0.1); border: 1px solid #e74c3c; padding: 20px; margin-bottom: 30px; color: #ff9999; border-radius: 4px; }
+
+    /* Права панель */
+    .order-summary { background: #0f0f0f; border: 2px solid #d4af37; padding: 30px; position: sticky; top: 100px; height: fit-content; }
+    .summary-item { display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid #222; padding-bottom: 8px; }
+    .total-price { font-size: 2.2rem; color: #f1c40f; font-weight: bold; text-align: center; margin: 25px 0; }
+    
+    .btn-checkout { background: #d4af37; color: #000; border: none; width: 100%; padding: 20px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: 0.3s; font-size: 1.1rem; }
+    .btn-checkout:hover { background: #f1c40f; box-shadow: 0 0 25px rgba(241, 196, 15, 0.4); }
+
+    @media (max-width: 992px) { .checkout-grid { grid-template-columns: 1fr; } .order-summary { position: static; } }
+</style>
+
+<div class="checkout-container">
+    <h1 class="checkout-title">Оформлення замовлення</h1>
+
+    <form method="post" id="checkout-form">
+        {% csrf_token %}
+
+        {% if form.errors %}
+        <div class="error-banner">
+            <strong>⚠️ Виправте наступні помилки:</strong>
+            <ul>
+                {% for field in form %}
+                    {% for error in field.errors %}<li>{{ field.label }}: {{ error }}</li>{% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <div class="checkout-grid">
+            <div class="checkout-form-steps">
+                
+                <div class="checkout-step">
+                    <div class="step-header">
+                        <span class="step-number">1</span>
+                        <h3>Ваші дані та доставка</h3>
+                    </div>
+                    
+                    {% for field in form %}
+                        {% if field.name != 'payment_method' %}
+                        <div class="form-field-wrapper">
+                            <label>{{ field.label }}</label>
+                            {{ field }}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="checkout-step">
+                    <div class="step-header">
+                        <span class="step-number">2</span>
+                        <h3>Спосіб оплати</h3>
+                    </div>
+                    <div class="form-field-wrapper">
+                        <label>Оберіть метод оплати</label>
+                        {% if form.payment_method %}
+                            {{ form.payment_method }}
+                        {% else %}
+                            <select name="payment_method">
+                                <option value="cod">📦 Оплата при отриманні</option>
+                                <option value="card">💳 Карткою онлайн</option>
+                                <option value="crystals">🪙 Магічні кристали</option>
+                            </select>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="order-summary">
+                <h3 style="color: #f1c40f; text-align: center; text-transform: uppercase;">Ваша скарбниця</h3>
+                {% for item in cart_items %}
+                <div class="summary-item">
+                    <span>{{ item.product.name }} (x{{ item.quantity }})</span>
+                    <span>{{ item.product.price }} грн</span>
+                </div>
+                {% endfor %}
+
+                <div class="total-price">{{ total_cart_price }} грн</div>
+
+                <button type="submit" class="btn-checkout">⚔️ Підтвердити замовлення</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Поля, де мають бути ТІЛЬКИ БУКВИ (Ім'я, Прізвище, Місто)
+        const textOnlyFields = document.querySelectorAll('input[name*="first_name"], input[name*="last_name"], input[name*="city"]');
+        
+        // Поле, де мають бути ТІЛЬКИ ЦИФРИ (Телефон)
+        const phoneField = document.querySelector('input[name*="phone"]');
+
+        textOnlyFields.forEach(field => {
+            field.addEventListener('input', function() {
+                // Видаляємо цифри та спецсимволи, залишаємо літери, пробіли та дефіси
+                this.value = this.value.replace(/[0-9]/g, '');
+            });
+        });
+
+        if (phoneField) {
+            phoneField.addEventListener('input', function() {
+                // Видаляємо все, крім цифр та знака +
+                this.value = this.value.replace(/[^0-9+]/g, '');
+            });
+        }
+    });
+</script>
+
+{% endblock %}
